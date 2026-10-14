@@ -93,3 +93,16 @@ def overlap_fraction(
 def _steps(total: float, step: float) -> list[float]:
     n = max(1, math.ceil(total / step))
     return [total * i / n for i in range(n + 1)]
+
+
+def decimate(coords: Sequence[LonLat], min_spacing_mi: float = 0.3) -> list[LonLat]:
+    """Thin a polyline for display: drop vertices closer than `min_spacing_mi` to the last
+    kept one. Always keeps the first and last vertex."""
+    if len(coords) <= 2:
+        return list(coords)
+    kept = [coords[0]]
+    for point in coords[1:-1]:
+        if haversine_mi(kept[-1], point) >= min_spacing_mi:
+            kept.append(point)
+    kept.append(coords[-1])
+    return kept
