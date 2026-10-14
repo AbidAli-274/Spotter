@@ -70,21 +70,22 @@ def _explain(best: int, metrics: Sequence[RouteMetrics], order: list[int]) -> st
         (RiskLevel.SEVERE, "Severe"),
         (RiskLevel.HIGH, "High"),
     ):
-        mine = best_m.miles(level)
-        theirs = [m.miles(level) for m in others]
-        if any(round(mine, MILES_PRECISION) != round(t, MILES_PRECISION) for t in theirs):
+        mine = round(best_m.miles(level), MILES_PRECISION)
+        worse = [round(m.miles(level), MILES_PRECISION) for m in others]
+        worse = [t for t in worse if t != mine]
+        if worse:
             if level == RiskLevel.NO_TRAVEL:
                 return "Only route(s) without No Travel conditions."
-            comparison = " and ".join(f"{t:.0f}" for t in theirs)
+            comparison = " and ".join(f"{t:.0f}" for t in worse)
             return f"Fewest {label} miles: {mine:.0f} mi vs {comparison} mi on the alternatives."
 
-    if any(
-        round(best_m.avg_risk, RISK_PRECISION) != round(m.avg_risk, RISK_PRECISION) for m in others
-    ):
-        comparison = " and ".join(f"{m.avg_risk:.2f}" for m in others)
+    mine_avg = round(best_m.avg_risk, RISK_PRECISION)
+    worse_avg = [round(m.avg_risk, RISK_PRECISION) for m in others]
+    worse_avg = [a for a in worse_avg if a != mine_avg]
+    if worse_avg:
+        comparison = " and ".join(f"{a:.2f}" for a in worse_avg)
         return (
-            f"Lowest average risk ({best_m.avg_risk:.2f} vs {comparison}) "
-            "with equal Severe/High exposure."
+            f"Lowest average risk ({mine_avg:.2f} vs {comparison}) with equal Severe/High exposure."
         )
 
     return "Routes carry equal weather risk; this one is the fastest."
