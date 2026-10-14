@@ -86,3 +86,8 @@ def test_single_route():
 def test_empty_raises():
     with pytest.raises(ValueError):
         recommend([])
+
+
+def test_reason_lists_only_alternatives_that_differ():
+    rec = recommend([metrics(high=0), metrics(high=0), metrics(high=25)])
+    assert rec.reason == "Fewest High miles: 0 mi vs 25 mi on the alternatives."

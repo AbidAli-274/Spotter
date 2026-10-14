@@ -8,10 +8,11 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 5173,
-      proxy: { '/api': env.VITE_PROXY_TARGET ?? 'http://localhost:8000' },
+      proxy: { '/api': env.VITE_PROXY_TARGET ?? 'http://127.0.0.1:8000' },
     },
     build: {
       target: 'es2022',
+      chunkSizeWarningLimit: 1100, // maplibre-gl is ~800 kB minified, loaded lazily
       rollupOptions: {
         output: { manualChunks: { maplibre: ['maplibre-gl'] } },
       },
