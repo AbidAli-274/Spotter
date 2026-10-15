@@ -85,6 +85,7 @@ export interface TripAnalysis {
   recommendation: { route_index: number; route_id: string; reason: string; all_blocked: boolean };
   routes: Route[];
   heatmap: Heatmap;
+  weather_source: 'open-meteo' | 'met-norway';
 }
 
 export interface ApiErrorBody {

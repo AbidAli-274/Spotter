@@ -31,6 +31,10 @@ React (Vite, MapLibre)  ──/api──▶  Django + DRF
 - **Unknown ≠ safe.** Missing forecast data yields `null` risk, tracked as unknown miles and excluded from averages.
 - **Structured errors.** Domain errors carry stable codes (`location_not_found`, `route_not_found`, `forecast_out_of_range`, `upstream_unavailable`).
 
+## Weather provider resilience
+
+`ResilientWeatherClient` tries Open-Meteo (batched, 15-day horizon) and on any upstream failure (notably HTTP 429 when a shared host's IP exhausts the free daily allowance) serves the request from MET Norway. A 10-minute cooldown flag in the cache sends later requests straight to the fallback so users aren't made to wait on a failing provider. Both clients return the same `HourlySeries`, so the risk engine is unaware of the source; the API reports it as `weather_source`.
+
 ## Caching
 
 A Django `DatabaseCache` (SQLite) keeps data across restarts without extra infrastructure:

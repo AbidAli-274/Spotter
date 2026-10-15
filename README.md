@@ -88,7 +88,8 @@ frontend/src           features/{trip-form,routes,map,heatmap}, api, hooks, lib
 ## Assumptions and limitations
 
 - Wind uses **sustained 10 m wind speed** (gusts are not scored). Rain is `rain + showers`; snow is forecast snowfall depth per hour (not water equivalent).
-- Forecasts reach ~15 days; checkpoints beyond that are shown as **Unknown** and excluded from averages rather than assumed safe.
+- **Weather providers.** Open-Meteo is primary. It limits requests per IP address, and shared hosts (such as Render's free tier) can exhaust that allowance, so on a 429/5xx the API falls back to **MET Norway** (keyless) for 10 minutes. The response reports `weather_source`, and the UI says which was used. MET has no snowfall variable: precipitation at or below 0.5 °C is treated as snow at a 10:1 ratio, so snow risk is an estimate in fallback mode.
+- Forecasts reach ~15 days (Open-Meteo; ~9 days on the MET fallback); checkpoints beyond that are shown as **Unknown** and excluded from averages rather than assumed safe.
 - Heatmap hour 0 is the departure hour, and heatmap levels are per-hour conditions for your load (not ETA-shifted).
 - Where the rule table shares an edge (e.g. rain 0.25 in/hr) the more severe band wins — see [docs/RISK_RULES.md](docs/RISK_RULES.md).
 - Truck restrictions use ORS's HGV profile and the load weight; bridge/hazmat data depends on OpenStreetMap coverage.

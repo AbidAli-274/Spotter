@@ -19,6 +19,11 @@ export function RouteList({ analysis, selectedId, onSelect }: Props) {
         </strong>
         <p>{recommendation.reason}</p>
       </div>
+      <p className="muted small source-note">
+        {analysis.weather_source === 'met-norway'
+          ? 'Forecast: MET Norway (backup provider). Snowfall is estimated from precipitation and temperature.'
+          : 'Forecast: Open-Meteo.'}
+      </p>
       {routes.map((route, i) => (
         <RouteCard
           key={route.id}
