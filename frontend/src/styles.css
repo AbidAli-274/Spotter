@@ -577,3 +577,7 @@ table.checkpoints {
   color: var(--muted);
   background: #e9edf3;
 }
+
+.source-note {
+  padding: 0 2px;
+}
