@@ -86,10 +86,13 @@ class OpenMeteoClient:
             if response.status_code < 500:
                 break
         if response is None or response.status_code >= 400:
-            logger.warning(
-                "Open-Meteo failed: %s", response.text[:200] if response else "no response"
+            status = response.status_code if response is not None else "no response"
+            reason = _reason(response)
+            logger.warning("Open-Meteo failed (%s): %s", status, reason)
+            raise UpstreamError(
+                f"The weather provider is unavailable (HTTP {status}: {reason}). "
+                "Please retry shortly."
             )
-            raise UpstreamError("The weather provider is unavailable. Please retry shortly.")
 
         payload = response.json()
         items = payload if isinstance(payload, list) else [payload]
@@ -116,3 +119,13 @@ def _sum(a: float | None, b: float | None) -> float | None:
     if a is None and b is None:
         return None
     return (a or 0.0) + (b or 0.0)
+
+
+def _reason(response: httpx.Response | None) -> str:
+    """Short provider-supplied reason (Open-Meteo returns {"reason": "..."} on errors)."""
+    if response is None:
+        return "no response"
+    try:
+        return str(response.json().get("reason", response.text))[:160]
+    except ValueError:
+        return response.text[:160]

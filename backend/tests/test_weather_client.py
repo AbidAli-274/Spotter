@@ -72,3 +72,10 @@ def test_provider_failure_raises_upstream_error():
     respx.get(URL).mock(return_value=httpx.Response(500))
     with pytest.raises(UpstreamError):
         OpenMeteoClient().hourly([(40, -100)], date(2099, 1, 1), date(2099, 1, 1))
+
+
+@respx.mock
+def test_error_message_includes_provider_status_and_reason():
+    respx.get(URL).respond(429, json={"error": True, "reason": "Daily API request limit exceeded."})
+    with pytest.raises(UpstreamError, match=r"HTTP 429: Daily API request limit exceeded"):
+        OpenMeteoClient().hourly([(40, -100)], date(2099, 1, 1), date(2099, 1, 1))
