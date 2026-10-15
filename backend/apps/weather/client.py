@@ -33,6 +33,8 @@ def snap(lat: float, lon: float) -> LatLon:
 
 
 class OpenMeteoClient:
+    source = "open-meteo"
+
     def __init__(self, client: httpx.Client | None = None) -> None:
         self._client = client or httpx.Client(timeout=settings.HTTP_TIMEOUT_SECONDS)
 

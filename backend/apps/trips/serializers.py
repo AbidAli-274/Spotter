@@ -127,6 +127,10 @@ class TripAnalysisSerializer(serializers.Serializer):
     recommendation = RecommendationSerializer()
     routes = RouteSerializer(many=True)
     heatmap = HeatmapSerializer()
+    weather_source = serializers.ChoiceField(
+        choices=["open-meteo", "met-norway"],
+        help_text="Provider that supplied the forecast (met-norway is the backup).",
+    )
 
 
 class AutocompleteQuerySerializer(serializers.Serializer):

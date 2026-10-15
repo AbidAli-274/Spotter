@@ -15,8 +15,9 @@ from apps.routing.geo import decimate
 from apps.routing.models import Place, Route
 from apps.routing.ors import OrsClient
 from apps.routing.sampling import Checkpoint, make_checkpoints
-from apps.weather.client import LatLon, OpenMeteoClient, forecast_horizon, snap
+from apps.weather.client import LatLon, forecast_horizon, snap
 from apps.weather.models import HourlySeries
+from apps.weather.resilient import ResilientWeatherClient
 
 from .errors import ForecastRangeError
 from .schemas import PlaceInput, TripRequest
@@ -49,9 +50,9 @@ def validate_departure(departure: datetime, now: datetime | None = None) -> None
 
 
 class TripAnalyzer:
-    def __init__(self, ors: OrsClient | None = None, weather: OpenMeteoClient | None = None):
+    def __init__(self, ors: OrsClient | None = None, weather: ResilientWeatherClient | None = None):
         self.ors = ors or OrsClient()
-        self.weather = weather or OpenMeteoClient()
+        self.weather = weather or ResilientWeatherClient()
 
     def analyze(self, req: TripRequest) -> dict[str, Any]:
         validate_departure(req.departure)
@@ -82,6 +83,7 @@ class TripAnalyzer:
                 for i, a in enumerate(analyzed)
             ],
             "heatmap": self._heatmap(heat_points, series, req),
+            "weather_source": getattr(self.weather, "source", "open-meteo"),
         }
 
     # -- steps -------------------------------------------------------------------
